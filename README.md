@@ -85,6 +85,14 @@ Built iteratively across 4 milestones:
 - **M3**: Advanced features — comparison mode, sensitivity analysis, worked examples, save/load
 - **M4**: Production polish — token estimator, embedding costs, mobile responsive, dark/light theme, URL routing
 
+## Author
+
+Created by Oz Levi | [SemanticOps AI](https://www.linkedin.com/company/semanticops-ai/)
+
+## Disclaimer
+
+This tool is provided "as is" without warranty of any kind, express or implied. The creators are not responsible for any damages or losses arising from its use. Verify current model pricing before use in financial planning.
+
 ## License
 
 MIT

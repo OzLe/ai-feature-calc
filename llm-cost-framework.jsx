@@ -2576,11 +2576,19 @@ export default function LLMCostFramework() {
       </div>
 
       {/* FOOTER */}
-      <div className={`text-center text-xs ${t.textQuaternary} mt-4 sm:mt-8 pb-4 px-3`}>
-        Framework v{FRAMEWORK_VERSION} | Pricing last updated: {pricingDateFormatted}
-        <br className="sm:hidden" />
-        <span className="hidden sm:inline"> | </span>
-        <span className={t.textTertiary}>Verify current rates before use in financial planning</span>
+      <div className={`text-center text-xs ${t.textQuaternary} mt-4 sm:mt-8 pb-4 px-3 space-y-1`}>
+        <div>
+          Framework v{FRAMEWORK_VERSION} | Pricing last updated: {pricingDateFormatted}
+          <br className="sm:hidden" />
+          <span className="hidden sm:inline"> | </span>
+          <span className={t.textTertiary}>Verify current rates before use in financial planning</span>
+        </div>
+        <div>
+          Created by Oz Levi | <a href="https://www.linkedin.com/company/semanticops-ai/" target="_blank" rel="noopener noreferrer" className={`${t.accent} underline hover:opacity-80`}>SemanticOps AI</a>
+        </div>
+        <div className={t.textQuaternary}>
+          This tool is provided "as is" without warranty of any kind. The creators are not responsible for any damages or losses arising from its use.
+        </div>
       </div>
     </div>
   );
