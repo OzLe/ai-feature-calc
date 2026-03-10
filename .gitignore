@@ -10,3 +10,6 @@ Thumbs.db
 
 # Node
 node_modules/
+
+# Build output
+dist/
