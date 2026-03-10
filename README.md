@@ -76,15 +76,6 @@ Where Token Budget accounts for:
 
 Full details in `llm-cost-framework-methodology.md`.
 
-## Development History
-
-Built iteratively across 4 milestones:
-
-- **M1**: Critical fixes — formula corrections, pricing updates, input validation
-- **M2**: Core enhancements — improved caching model, recommendations engine, export/share
-- **M3**: Advanced features — comparison mode, sensitivity analysis, worked examples, save/load
-- **M4**: Production polish — token estimator, embedding costs, mobile responsive, dark/light theme, URL routing
-
 ## Author
 
 Created by Oz Levi | [SemanticOps AI](https://www.linkedin.com/company/semanticops-ai/)
