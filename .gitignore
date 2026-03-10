@@ -8,6 +8,14 @@ Thumbs.db
 # Claude Code
 .claude/
 
+# Environment variables
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+.env.staging
+
 # Node
 node_modules/
 
