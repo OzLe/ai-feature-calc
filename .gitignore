@@ -1,0 +1,12 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Babysitter orchestration
+.a5c/
+
+# Claude Code
+.claude/
+
+# Node
+node_modules/
