@@ -49,7 +49,8 @@
       "cacheWrite5min": 18.75,
       "cacheWrite1hr": 30.00,
       "reasoning": false,
-      "deprecated": false
+      "deprecated": true,
+      "deprecationNote": "Superseded by Claude Opus 4.5/4.6 at lower pricing."
     },
     {
       "id": "claude-sonnet-4.6",
@@ -81,7 +82,7 @@
     },
     {
       "id": "claude-sonnet-4",
-      "label": "Claude Sonnet 4",
+      "label": "Claude Sonnet 4 (legacy)",
       "provider": "Anthropic",
       "tier": "mid",
       "in": 3.00,
@@ -91,7 +92,8 @@
       "cacheWrite5min": 3.75,
       "cacheWrite1hr": 6.00,
       "reasoning": false,
-      "deprecated": false
+      "deprecated": true,
+      "deprecationNote": "Superseded by Claude Sonnet 4.5/4.6."
     },
     {
       "id": "claude-haiku-4.5",
@@ -119,11 +121,12 @@
       "cacheWrite5min": 1.00,
       "cacheWrite1hr": 1.60,
       "reasoning": false,
-      "deprecated": false
+      "deprecated": true,
+      "deprecationNote": "Superseded by Claude Haiku 4.5."
     },
     {
       "id": "gpt-4o",
-      "label": "GPT-4o",
+      "label": "GPT-4o (legacy)",
       "provider": "OpenAI",
       "tier": "mid",
       "in": 2.50,
@@ -133,11 +136,12 @@
       "cacheWrite5min": null,
       "cacheWrite1hr": null,
       "reasoning": false,
-      "deprecated": false
+      "deprecated": true,
+      "deprecationNote": "Superseded by GPT-4.1 and GPT-5."
     },
     {
       "id": "gpt-4o-mini",
-      "label": "GPT-4o mini",
+      "label": "GPT-4o mini (legacy)",
       "provider": "OpenAI",
       "tier": "economy",
       "in": 0.15,
@@ -147,7 +151,8 @@
       "cacheWrite5min": null,
       "cacheWrite1hr": null,
       "reasoning": false,
-      "deprecated": false
+      "deprecated": true,
+      "deprecationNote": "Superseded by GPT-4.1 mini and GPT-5 mini."
     },
     {
       "id": "gpt-4.1",
@@ -193,9 +198,9 @@
     },
     {
       "id": "o3",
-      "label": "o3",
+      "label": "o3 (legacy)",
       "provider": "OpenAI",
-      "tier": "premium",
+      "tier": "mid",
       "in": 2.00,
       "out": 8.00,
       "cache": 0.50,
@@ -203,7 +208,8 @@
       "cacheWrite5min": null,
       "cacheWrite1hr": null,
       "reasoning": true,
-      "deprecated": false
+      "deprecated": true,
+      "deprecationNote": "Superseded by o4-mini. Priced as mid-tier."
     },
     {
       "id": "o3-pro",
@@ -221,7 +227,7 @@
     },
     {
       "id": "o3-mini",
-      "label": "o3-mini",
+      "label": "o3-mini (legacy)",
       "provider": "OpenAI",
       "tier": "mid",
       "in": 1.10,
@@ -231,7 +237,8 @@
       "cacheWrite5min": null,
       "cacheWrite1hr": null,
       "reasoning": true,
-      "deprecated": false
+      "deprecated": true,
+      "deprecationNote": "Superseded by o4-mini."
     },
     {
       "id": "o4-mini",
@@ -249,7 +256,7 @@
     },
     {
       "id": "o1",
-      "label": "o1",
+      "label": "o1 (legacy)",
       "provider": "OpenAI",
       "tier": "premium",
       "in": 15.00,
@@ -259,7 +266,8 @@
       "cacheWrite5min": null,
       "cacheWrite1hr": null,
       "reasoning": true,
-      "deprecated": false
+      "deprecated": true,
+      "deprecationNote": "Superseded by o3-pro."
     },
     {
       "id": "gpt-5",
