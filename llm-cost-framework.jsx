@@ -1,104 +1,23 @@
 import { useState, useMemo, useEffect, useRef } from "react";
+import modelsConfig from "./src/models-config.json";
 
-// Keep in sync with llm-cost-framework-methodology.md footer version
-const FRAMEWORK_VERSION = "2.0";
-const PRICING_DATE = "Q1 2026";
-
-// ─── PRICING DATA GOVERNANCE (M4-10) ────────────────────────────────────────
-const PRICING_LAST_UPDATED = "2026-03-10";
-const PRICING_STALENESS_DAYS = 90;
-// Provider pricing page URLs for easy reference during pricing updates:
-// Anthropic: https://docs.anthropic.com/en/docs/about-claude/models
-// OpenAI:    https://openai.com/api/pricing/
-// Google:    https://ai.google.dev/pricing
-const PROVIDER_PRICING_URLS = {
-  Anthropic: "https://docs.anthropic.com/en/docs/about-claude/models",
-  OpenAI: "https://openai.com/api/pricing/",
-  Google: "https://ai.google.dev/pricing",
-};
-
-// ─── DATA ────────────────────────────────────────────────────────────────────
-
-const MODELS = [
-  // ── Anthropic ────────────────────────────────────────────────────────
-  { id: "claude-opus-4.6",   label: "Claude Opus 4.6",   provider: "Anthropic", tier: "premium",  in: 5.00,   out: 25.00,  cache: 0.50,   cacheWrite: 6.25,  cacheWrite5min: 6.25,  cacheWrite1hr: 10.00, reasoning: false, deprecated: false },
-  { id: "claude-opus-4.5",   label: "Claude Opus 4.5",   provider: "Anthropic", tier: "premium",  in: 15.00,  out: 75.00,  cache: 1.50,   cacheWrite: 18.75, cacheWrite5min: 18.75, cacheWrite1hr: 30.00, reasoning: false, deprecated: false },
-  { id: "claude-sonnet-4.6", label: "Claude Sonnet 4.6",  provider: "Anthropic", tier: "mid",      in: 3.00,   out: 15.00,  cache: 0.30,   cacheWrite: 3.75,  cacheWrite5min: 3.75,  cacheWrite1hr: 6.00,  reasoning: false, deprecated: false },
-  { id: "claude-sonnet-4.5", label: "Claude Sonnet 4.5",  provider: "Anthropic", tier: "mid",      in: 3.00,   out: 15.00,  cache: 0.30,   cacheWrite: 3.75,  cacheWrite5min: 3.75,  cacheWrite1hr: 6.00,  reasoning: false, deprecated: false },
-  { id: "claude-haiku-4.5",  label: "Claude Haiku 4.5",   provider: "Anthropic", tier: "economy",  in: 0.80,   out: 4.00,   cache: 0.08,   cacheWrite: 1.00,  cacheWrite5min: 1.00,  cacheWrite1hr: 1.60,  reasoning: false, deprecated: false },
-  // ── OpenAI ───────────────────────────────────────────────────────────
-  { id: "gpt-4o",            label: "GPT-4o",             provider: "OpenAI",    tier: "mid",      in: 2.50,   out: 10.00,  cache: 1.25,   cacheWrite: null,  reasoning: false, deprecated: false },
-  { id: "gpt-4o-mini",       label: "GPT-4o mini",        provider: "OpenAI",    tier: "economy",  in: 0.15,   out: 0.60,   cache: 0.075,  cacheWrite: null,  reasoning: false, deprecated: false },
-  { id: "gpt-4.1",           label: "GPT-4.1",            provider: "OpenAI",    tier: "mid",      in: 2.00,   out: 8.00,   cache: 0.50,   cacheWrite: null,  reasoning: false, deprecated: false },
-  { id: "gpt-4.1-mini",      label: "GPT-4.1 mini",       provider: "OpenAI",    tier: "economy",  in: 0.40,   out: 1.60,   cache: 0.10,   cacheWrite: null,  reasoning: false, deprecated: false },
-  { id: "gpt-4.1-nano",      label: "GPT-4.1 nano",       provider: "OpenAI",    tier: "economy",  in: 0.02,   out: 0.15,   cache: 0.005,  cacheWrite: null,  reasoning: false, deprecated: false },
-  { id: "o3",                label: "o3",                  provider: "OpenAI",    tier: "premium",  in: 2.00,   out: 8.00,   cache: null,   cacheWrite: null,  reasoning: true,  deprecated: false },
-  { id: "o4-mini",           label: "o4-mini",             provider: "OpenAI",    tier: "mid",      in: 1.10,   out: 4.40,   cache: null,   cacheWrite: null,  reasoning: true,  deprecated: false },
-  // ── Google ───────────────────────────────────────────────────────────
-  { id: "gemini-2.5-pro",    label: "Gemini 2.5 Pro",     provider: "Google",    tier: "mid",      in: 1.25,   out: 10.00,  cache: 0.125,  cacheWrite: null,  reasoning: false, deprecated: false },
-  { id: "gemini-2.5-flash",  label: "Gemini 2.5 Flash",   provider: "Google",    tier: "economy",  in: 0.30,   out: 2.50,   cache: 0.03,   cacheWrite: null,  reasoning: false, deprecated: false },
-  { id: "gemini-1.5-pro",    label: "Gemini 1.5 Pro",     provider: "Google",    tier: "mid",      in: 1.25,   out: 5.00,   cache: 0.3125, cacheWrite: null,  reasoning: false, deprecated: true, deprecationNote: "Superseded by Gemini 2.5 Pro. Output price doubled to $10/1M." },
-  { id: "gemini-2.0-flash",  label: "Gemini 2.0 Flash",   provider: "Google",    tier: "economy",  in: 0.10,   out: 0.40,   cache: 0.025,  cacheWrite: null,  reasoning: false, deprecated: true, deprecationNote: "EOL June 2026. Use Gemini 2.5 Flash." },
-];
-
-const ARCHETYPES = [
-  {
-    id: "simple-rag",
-    label: "Simple RAG / Q&A",
-    icon: "◎",
-    description: "Single-turn lookup with retrieved context",
-    defaults: { systemPrompt: 500, ragContext: 2000, userInput: 150, output: 400, agenticMult: 1, historyDepth: 0 },
-  },
-  {
-    id: "chatbot",
-    label: "Multi-turn Chatbot",
-    icon: "◈",
-    description: "Conversational assistant with memory",
-    defaults: { systemPrompt: 800, ragContext: 1500, userInput: 200, output: 600, agenticMult: 1, historyDepth: 8 },
-  },
-  {
-    id: "agentic",
-    label: "Agentic Workflow",
-    icon: "◐",
-    description: "Multi-step reasoning with tool calls",
-    defaults: { systemPrompt: 1500, ragContext: 2000, userInput: 300, output: 800, agenticMult: 8, historyDepth: 4 },
-  },
-  {
-    id: "doc-processing",
-    label: "Document Processing",
-    icon: "◧",
-    description: "Batch ingestion, summarization, extraction",
-    defaults: { systemPrompt: 600, ragContext: 0, userInput: 8000, output: 1000, agenticMult: 1, historyDepth: 0 },
-  },
-  {
-    id: "code-gen",
-    label: "Code Generation",
-    icon: "◩",
-    description: "Code writing, review, refactoring",
-    defaults: { systemPrompt: 1000, ragContext: 3000, userInput: 500, output: 1500, agenticMult: 2, historyDepth: 3 },
-  },
-  {
-    id: "classifier",
-    label: "Classification / Extraction",
-    icon: "◷",
-    description: "Labeling, structured data extraction",
-    defaults: { systemPrompt: 400, ragContext: 0, userInput: 500, output: 100, agenticMult: 1, historyDepth: 0 },
-  },
-];
+const {
+  frameworkVersion: FRAMEWORK_VERSION,
+  pricingDate: PRICING_DATE,
+  pricingLastUpdated: PRICING_LAST_UPDATED,
+  pricingStaleDays: PRICING_STALENESS_DAYS,
+  providerPricingUrls: PROVIDER_PRICING_URLS,
+  models: MODELS,
+  embeddingModels: EMBEDDING_MODELS,
+  featureArchetypes: ARCHETYPES,
+  workedExamples: WORKED_EXAMPLES,
+} = modelsConfig;
 
 const CACHE_SCENARIOS = [
   { id: "none",       label: "No caching",          ratio: 0 },
   { id: "low",        label: "Low (~20%)",           ratio: 0.20 },
   { id: "medium",     label: "Moderate (~50%)",      ratio: 0.50 },
   { id: "high",       label: "High (~80%)",          ratio: 0.80 },
-];
-
-// ─── EMBEDDING MODELS (M4-3) ────────────────────────────────────────────────
-
-const EMBEDDING_MODELS = [
-  { id: "text-embedding-3-small", label: "text-embedding-3-small (OpenAI)", price: 0.02 },
-  { id: "text-embedding-3-large", label: "text-embedding-3-large (OpenAI)", price: 0.13 },
-  { id: "voyage-3", label: "Voyage 3 (Anthropic)", price: 0.06 },
 ];
 
 // ─── TOKEN HEURISTICS (M3-8) ────────────────────────────────────────────────
@@ -118,39 +37,6 @@ const TOKEN_INFLATORS = [
   "Structured output schemas: ~100-400 tokens",
   "Few-shot examples: full token length per example",
   "Chain-of-thought reasoning: 2-5x output multiplier for complex tasks",
-];
-
-// ─── WORKED EXAMPLES (M3-3) ─────────────────────────────────────────────────
-
-const WORKED_EXAMPLES = [
-  {
-    id: "hr-chatbot",
-    label: "Internal HR Chatbot",
-    description: "Enterprise multi-turn chatbot with RAG on HR policy docs. 2,000 employees, moderate usage.",
-    expectedMonthlyCost: 1106,
-    config: {
-      modelId: "claude-sonnet-4.5",
-      systemPrompt: 800, ragContext: 2000, userInput: 150, output: 500,
-      agenticMult: 1, historyDepth: 6, avgTurnsHistory: 0.5,
-      mau: 2000, dau: 600, sessionsPerUser: 1, interactionsPerSession: 4,
-      cacheRatio: 0.60, cacheReuses: 10, cacheTTL: "5min",
-      reasoningMultiplier: 1,
-    },
-  },
-  {
-    id: "agentic-research",
-    label: "Consumer Agentic Research Assistant",
-    description: "Consumer-facing 6-step agent with web search. 50K MAU, high interaction volume.",
-    expectedMonthlyCost: 255990,
-    config: {
-      modelId: "claude-sonnet-4.5",
-      systemPrompt: 1500, ragContext: 3000, userInput: 300, output: 1000,
-      agenticMult: 6, historyDepth: 3, avgTurnsHistory: 0.5,
-      mau: 50000, dau: 12500, sessionsPerUser: 1.2, interactionsPerSession: 3,
-      cacheRatio: 0.20, cacheReuses: 10, cacheTTL: "5min",
-      reasoningMultiplier: 1,
-    },
-  },
 ];
 
 // ─── THEMES (M4-9) ──────────────────────────────────────────────────────────
